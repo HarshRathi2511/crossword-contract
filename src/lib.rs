@@ -27,7 +27,7 @@ impl Contract {
         if solution== self.crossword_solution {
             env::log_str("You guessed right")
         } else {
-            env::log_str("Try again")
+            env::log_str("Try again for winning the crossword puzzle")
         }
         // Well, logging is ultimately captured inside blocks added to the blockchain. (More accurately, transactions are contained in chunks and chunks are contained in blocks. More info in the Nomicon spec.) So while it is not changing the data in the fields of the struct, it does cost some amount of gas to log, requiring a signed transaction by an account that pays for this gas.
     }

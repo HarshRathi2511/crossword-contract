@@ -1,10 +1,22 @@
 #!/bin/bash 
 set -e
 
+# echo "enter masterAccount..."
+# read masterAccount
+# echo "master account is $masterAccount"
+
+echo ""
+echo "building wasm file to be deployed........."
+echo ""
+# giving permissions to the build script to execute 
+chmod +x build.sh   
+./build.sh
+
 echo "creating a new testnet subaccount of harshrathi2511.testnet"
 
 # should ideally create a random testnet account and then deploy to it  
 near create-account crossword.harshrathi2511.testnet --masterAccount harshrathi2511.testnet
+echo ""
 
 echo "viewing the state of the subaccount crossword.harshrathi2511.testnet"
 echo ""
