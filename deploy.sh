@@ -1,6 +1,8 @@
 #!/bin/bash 
 set -e
 
+chmod +x deploy.sh
+
 # echo "enter masterAccount..."
 # read masterAccount
 # echo "master account is $masterAccount"

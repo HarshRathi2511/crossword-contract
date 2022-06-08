@@ -29,17 +29,16 @@ impl Contract {
     }
 
     //creates a transaction id while executing the script
-    pub fn guess_solution(&mut self, solution: String)->bool {
+    pub fn guess_solution(&mut self, solution: String) -> bool {
         //solution is the user guess
 
-        // convert the user solution to sha256 and then compare it 
+        // convert the user solution to sha256 and then compare it
         let hashed_input = env::sha256(solution.as_bytes());
         let hashed_input_hex = hex::encode(&hashed_input);
 
         if hashed_input_hex == self.crossword_solution {
             env::log_str("You guessed right");
             true
-
         } else {
             env::log_str("Try again for winning the crossword puzzle");
             false
@@ -48,12 +47,6 @@ impl Contract {
     }
 }
 
-/*
- * the rest of this file sets up unit tests
- * to run these, the command will be:
- * cargo test --package rust-template -- --nocapture
- * Note: 'rust-template' comes from Cargo.toml's 'name' key
- */
 
 // use the attribute below for unit tests
 #[cfg(test)]
@@ -100,8 +93,7 @@ mod tests {
             "69c2feb084439956193f4c21936025f14a5a5a78979d67ae34762e18a7206a0f".to_string(),
         );
 
-        let  guess_result = contract.guess_solution("near nomicon ref finance".to_string());
-
-        assert!(guess_result,"this will pass for this");
+        let guess_result = contract.guess_solution("near nomicon ref finance".to_string());
+        assert!(guess_result, "this will pass for this");
     }
 }
