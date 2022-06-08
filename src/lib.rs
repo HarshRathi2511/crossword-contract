@@ -21,7 +21,8 @@ impl Contract {
     pub fn set_solution(&mut self, solution:String){
         self.crossword_solution =solution;
     }
-
+    
+    //creates a transaction id while executing the script 
     pub fn guess_solution(&mut self, solution:String) {   //solution is the user guess 
         if solution== self.crossword_solution {
             env::log_str("You guessed right")
