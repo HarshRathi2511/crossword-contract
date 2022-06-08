@@ -2,13 +2,14 @@
 
 ## Getting started
 
-##Crossword Game 
-Example implementation of a Crossword Game contract which uses near-contract-standards and simulation tests. 
+## Crossword Game 
+Implementation of a Crossword Game contract built using rust which uses near-contract-standards and simulation tests. 
 
-Prerequisites
+## Prerequisites
 
 Make sure Rust is installed per the prerequisites in near-sdk-rs
-Ensure near-cli is installed by running near --version. If not installed, install with: npm install -g near-cli
+Ensure near-cli is installed by running near --version. 
+If not installed, install with: npm install -g near-cli
 
 ## Building
 Replace the placeholder account with your testnet account in all the scripts 
