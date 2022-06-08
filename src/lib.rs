@@ -12,6 +12,12 @@ pub struct Contract {
 
 #[near_bindgen]
 impl Contract {
+    #[init] //initialization macro for the contract
+    pub fn new(solution: String) -> Contract {
+        Contract {
+            crossword_solution: solution,
+        }
+    }
     // ADD CONTRACT METHODS HERE
     pub fn get_puzzle_number(&self) -> u8 {
         PUZZLE_NUMBER
@@ -23,12 +29,20 @@ impl Contract {
     }
 
     //creates a transaction id while executing the script
-    pub fn guess_solution(&mut self, solution: String) {
+    pub fn guess_solution(&mut self, solution: String)->bool {
         //solution is the user guess
-        if solution == self.crossword_solution {
-            env::log_str("You guessed right")
+
+        // convert the user solution to sha256 and then compare it 
+        let hashed_input = env::sha256(solution.as_bytes());
+        let hashed_input_hex = hex::encode(&hashed_input);
+
+        if hashed_input_hex == self.crossword_solution {
+            env::log_str("You guessed right");
+            true
+
         } else {
-            env::log_str("Try again for winning the crossword puzzle")
+            env::log_str("Try again for winning the crossword puzzle");
+            false
         }
         // Well, logging is ultimately captured inside blocks added to the blockchain. (More accurately, transactions are contained in chunks and chunks are contained in blocks. More info in the Nomicon spec.) So while it is not changing the data in the fields of the struct, it does cost some amount of gas to log, requiring a signed transaction by an account that pays for this gas.
     }
@@ -50,7 +64,7 @@ mod tests {
 
     //The important thing to remember is VMContext will be sending mock transactions with the context specified above. So if a unit test needs to send a test transaction coming from Alice, and then another from Bob, the get_context method may be called to change the signer_account_id or predecessor_account_id, or whatever the contract needs.
 
-    // here the predecessor id is in our control for the tests 
+    // here the predecessor id is in our control for the tests
     fn get_context(predecessor: AccountId) -> VMContextBuilder {
         let mut vm_ctx_builder = VMContextBuilder::new();
         vm_ctx_builder.predecessor_account_id(predecessor);
@@ -68,21 +82,26 @@ mod tests {
         println!("{:?}", debug_hash_bytes); //this hash implements the debig trait not the display one
                                             // convert to hex format
         let debug_hash_string = hex::encode(debug_hash_bytes);
-        println!("{:?}", debug_hash_string); 
+        println!("{:?}", debug_hash_string);
         // Hash of the correct solution
         //"69c2feb084439956193f4c21936025f14a5a5a78979d67ae34762e18a7206a0f"
     }
 
     #[test]
     fn check_guess_solution() {
-        // get harsh's account id 
+        // get harsh's account id
         let harsh = AccountId::new_unchecked("harshrathi2511.testnet".to_string());
-        //set the context and the test environment 
+        //set the context and the test environment
         let context = get_context(harsh);
         testing_env!(context.build());
 
+        //create the contract with the correct solution
+        let mut contract = Contract::new(
+            "69c2feb084439956193f4c21936025f14a5a5a78979d67ae34762e18a7206a0f".to_string(),
+        );
 
+        let  guess_result = contract.guess_solution("near nomicon ref finance".to_string());
+
+        assert!(guess_result,"this will pass for this");
     }
-
-
 }
