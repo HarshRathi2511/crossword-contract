@@ -11,7 +11,7 @@ echo ""
 echo "setting answers along with the clues  on NEAR......"
 
 near call crossword.harshrathi2511.testnet new_puzzle '{
-  "solution_hash": "d1a5cf9ad1adefe0528f7d31866cf901e665745ff172b96892693769ad284010",  
+  "solution_hash": "69c2feb084439956193f4c21936025f14a5a5a78979d67ae34762e18a7206a0f",  
   "answers": [
    {
      "num": 1,
@@ -65,3 +65,8 @@ near call crossword.harshrathi2511.testnet new_puzzle '{
    }
   ]
 }' --accountId crossword.harshrathi2511.testnet
+
+
+echo ""
+echo "calling submit solution where signer_id is harshrathi2511.testnet "
+near call crossword.harshrathi2511.testnet submit_solution '{"solution": "near nomicon ref finance" , "memo": "Yayy I won!"}' --accountId harshrathi2511.testnet

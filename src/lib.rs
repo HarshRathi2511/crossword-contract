@@ -115,7 +115,7 @@ impl Crossword {
         let hashed_input = env::sha256(solution.as_bytes());
         let hashed_input_hex = hex::encode(&hashed_input);
 
-        //check if the hashed answer is among the puzzles
+        //check if the users hashed answer corresponding puzzle is in the lookup map
         let mut puzzle = self
             .puzzles
             .get(&hashed_input_hex)
