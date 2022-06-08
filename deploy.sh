@@ -34,8 +34,8 @@ echo ""
 
 # using batch actions to instantiate the function 
 near deploy crossword.harshrathi2511.testnet --wasmFile res/my_crossword.wasm \
- --initFunction 'new' \
- --initArgs '{"solution" : "69c2feb084439956193f4c21936025f14a5a5a78979d67ae34762e18a7206a0f"}'
+ --initFunction 'new'  \
+ --initArgs '{"owner_id": "crossword.harshrathi2511.testnet"}'
  
 echo ""
 

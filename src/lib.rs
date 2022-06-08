@@ -1,15 +1,17 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LookupMap, UnorderedSet};
 use near_sdk::serde::{Deserialize, Serialize};
-use near_sdk::{env, near_bindgen, AccountId, PanicOnDefault};
+use near_sdk::{env, near_bindgen, AccountId, PanicOnDefault,log,Promise};
 
 const PUZZLE_NUMBER: u8 = 1;
+// 5 Ⓝ in yoctoNEAR
+const PRIZE_AMOUNT: u128 = 5_000_000_000_000_000_000_000_000;
 
-#[derive(BorshDeserialize, BorshSerialize, Debug, Serialize,Deserialize)]
+#[derive(BorshDeserialize, BorshSerialize, Debug, Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
 enum PuzzleStatus {
     Unsolved,
-    Solved {memo:String},  //eg "Took me forever to get clue six!" (winners can write this) 
+    Solved { memo: String }, //eg "Took me forever to get clue six!" (winners can write this)
 }
 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize, Debug)]
@@ -42,14 +44,13 @@ pub struct Puzzle {
     answer: Vec<Answer>,
 }
 
-#[derive(Serialize,Deserialize)]  //json serializing
+#[derive(Serialize, Deserialize)] //json serializing
 #[serde(crate = "near_sdk::serde")]
 pub struct JsonPuzzle {
-    //for returning data to frontend 
-    solution_hash:String,
-    status : PuzzleStatus,
-    answer : Vec<Answer>,
-
+    //for returning data to frontend
+    solution_hash: String,
+    status: PuzzleStatus,
+    answer: Vec<Answer>,
 }
 
 // Remember that there will be only one struct that gets the #[near_bindgen] macro placed on it; our primary struct or singleton
@@ -83,7 +84,7 @@ impl Crossword {
     pub fn new_puzzle(&mut self, solution_hash: String, answers: Vec<Answer>) {
         // even a person with full access keys cannot call this method due to this check
         assert_eq!(
-            env::predecessor_account_id(), //predecessor:- the person who most recently called this method,
+            env::predecessor_account_id(), //predecessor:- the person who most recently called this contract has to be the owner of the contract ,
             self.owner_id,
             "Only the owner of the contract may call this method"
         );
@@ -106,28 +107,47 @@ impl Crossword {
         self.unsolved_puzzles.insert(&solution_hash);
     }
 
-    // changes state
-    // pub fn set_solution(&mut self, solution: String) {
-    //     self.crossword_solution = solution;
-    // }
+    // creates a transaction id while executing the script
+    pub fn submit_solution(&mut self, solution: String, memo: String) {
+        //solution is the user guess
 
-    //creates a transaction id while executing the script
-    // pub fn guess_solution(&mut self, solution: String) -> bool {
-    //     //solution is the user guess
+        // convert the user solution to sha256 and then compare it
+        let hashed_input = env::sha256(solution.as_bytes());
+        let hashed_input_hex = hex::encode(&hashed_input);
 
-    //     // convert the user solution to sha256 and then compare it
-    //     let hashed_input = env::sha256(solution.as_bytes());
-    //     let hashed_input_hex = hex::encode(&hashed_input);
+        //check if the hashed answer is among the puzzles
+        let mut puzzle = self
+            .puzzles
+            .get(&hashed_input_hex)
+            .expect("ERR_NOT_CORRECT_ANSWER");
+        // Well, logging is ultimately captured inside blocks added to the blockchain. (More accurately, transactions are contained in chunks and chunks are contained in blocks. More info in the Nomicon spec.) So while it is not changing the data in the fields of the struct, it does cost some amount of gas to log, requiring a signed transaction by an account that pays for this gas.
 
-    //     if hashed_input_hex == self.crossword_solution {
-    //         env::log_str("You guessed right");
-    //         true
-    //     } else {
-    //         env::log_str("Try again for winning the crossword puzzle");
-    //         false
-    //     }
-    //     // Well, logging is ultimately captured inside blocks added to the blockchain. (More accurately, transactions are contained in chunks and chunks are contained in blocks. More info in the Nomicon spec.) So while it is not changing the data in the fields of the struct, it does cost some amount of gas to log, requiring a signed transaction by an account that pays for this gas.
-    // }
+        // Check if the puzzle is already solved. If it's unsolved, set the status to solved,
+        //   then proceed to update the puzzle and pay the winner.
+        puzzle.status = match puzzle.status {
+            PuzzleStatus::Unsolved => PuzzleStatus::Solved { memo: memo.clone() },
+            // for rest other cases err message
+            _ => {
+                env::panic_str("ERR_PUZZLE_SOLVED");
+            }
+
+        };
+
+        //reinsert the puzzles after we have changed it 
+        self.puzzles.insert(&hashed_input_hex,&puzzle);
+
+        // remove from unsolved hashes 
+        self.unsolved_puzzles.remove(&hashed_input_hex);
+
+        log!(
+            "Puzzle with solution hash {} solved, with memo: {}",
+            hashed_input_hex,
+            memo
+        );
+
+        // transfer the money to the winner 
+        Promise::new(env::predecessor_account_id()).transfer(PRIZE_AMOUNT);
+    }
 }
 
 // use the attribute below for unit tests
