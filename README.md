@@ -2,20 +2,18 @@
 
 ## Getting started
 
-To get started with this template:
+##Crossword Game 
+Example implementation of a Crossword Game contract which uses near-contract-standards and simulation tests. 
 
-1. Click the "Use this template" button to create a new repo based on this template
-2. Update line 2 of `Cargo.toml` with your project name
-3. Update line 4 of `Cargo.toml` with your project author names
-4. Set up the [prerequisites](https://github.com/near/near-sdk-rs#pre-requisites)
-5. Begin writing your smart contract in `src/lib.rs`
-6. Test the contract 
+Prerequisites
 
-    `cargo test -- --nocapture`
+Make sure Rust is installed per the prerequisites in near-sdk-rs
+Ensure near-cli is installed by running near --version. If not installed, install with: npm install -g near-cli
 
-8. Build the contract
-
-    `RUSTFLAGS='-C link-arg=-s' cargo build --target wasm32-unknown-unknown --release`
+## Building
+Replace the placeholder account with your testnet account in all the scripts 
+To deploy run:
+./deploy.sh
 
 **Get more info at:**
 
