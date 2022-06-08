@@ -29,10 +29,14 @@ echo ""
 near state crossword.harshrathi2511.testnet
 echo ""
 
-echo "deploying the contract (wasm file) to the subaccount "
+echo "deploying the contract (wasm file) to the subaccount ...using batch actions to #[init] "
 echo ""
 
-near deploy crossword.harshrathi2511.testnet --wasmFile res/my_crossword.wasm 
+# using batch actions to instantiate the function 
+near deploy crossword.harshrathi2511.testnet --wasmFile res/my_crossword.wasm \
+ --initFunction 'new' \
+ --initArgs '{"solution" : "69c2feb084439956193f4c21936025f14a5a5a78979d67ae34762e18a7206a0f"}'
+ 
 echo ""
 
 echo " checking if the code hashes are all ones.........."
